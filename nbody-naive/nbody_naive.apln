@@ -1,0 +1,23 @@
+:Namespace nbody_naive
+
+⎕IO←0
+
+calc_slow←{k t m←⍺
+	{
+		p v←⍵
+		p+←t×v←v+t×+/d×⍤2⊢m×[1](÷(1e¯9++⌿(d←∘.-⍤1⍨p)*2)*.5)*3
+		p v
+	}⍣k⊢⍵
+}
+
+Run←{K T N←3↑⍵,10 0.1 100000
+	⎕←'Iterations:',K,'Particles:',N
+	m←20×÷1+⍳N ⋄ v←3 N⍴0 ⋄ p←?3 N⍴0
+	start←24 60 60 1000⊥¯4↑⎕TS
+	p v←K T m calc_slow p v
+	end←24 60 60 1000⊥¯4↑⎕TS
+	⎕←'Runtime: ',(⍕(end-start)÷1000),'secs'
+	1:shy←m p v
+}
+
+:EndNamespace

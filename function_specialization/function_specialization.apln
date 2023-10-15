@@ -1,0 +1,39 @@
+:Namespace function_specialization
+
+specialize←{
+	mark←{⍵@2⊢⍺}
+	⊃,⌿{recur←∇
+		id type kind val bs kids←⍵
+		kids←{0≡≢kids:⍬ ⋄ ⊃,/recur¨kids}⍵
+		specd←id type kind val bs kids
+		type≢'F':1⍴⊂specd
+		kind=0:,⊂specd mark 0
+		kind=1:,⊂specd mark 1
+		kind=2:specd∘mark¨2+⍳2
+		kind=3:specd∘mark¨4+⍳4
+		kind=4:specd∘mark¨8+⍳8
+		⎕SIGNAL 11
+	}⍵
+}
+
+count←{0≡≢5⊃⍵:1 ⋄ 1++⌿∇¨5⊃⍵}
+
+load←{
+	tie←'nested_data.dcf'⎕FTIE 0
+	res←⎕FREAD tie ⍵
+	res⊣⎕FUNTIE tie
+}
+
+Run←{
+	tie←'nested_data.dcf'⎕FTIE 0
+	in←⎕FREAD tie 1
+	out←⎕FREAD tie 2
+	_←⎕FUNTIE tie
+	start←24 60 60 1000⊥¯4↑⎕TS
+	res←specialize in
+	end←24 60 60 1000⊥¯4↑⎕TS
+	⎕←'Specialize time elapsed: ',(⍕(end-start)÷1000),'secs'
+	⎕←'Failed verification' 'Passed verification'[out≡res]
+}
+
+:EndNamespace
