@@ -1,0 +1,50 @@
+:Namespace function_specialization
+
+(A B C E F G K L M N O P S V Z)←1+⍳15
+N∆←'_ABCEFGKLMNOPSVZ'
+
+specialize←{
+	mark←{⍵@2⊢⍺}
+	⊃,⌿{recur←∇
+		id type kind val bs kids←⍵
+		kids←{0≡≢kids:⍬ ⋄ ⊃,/recur¨kids}⍵
+		specd←id type kind val bs kids
+		type≢'F':1⍴⊂specd
+		kind=0:,⊂specd mark 0
+		kind=1:,⊂specd mark 1
+		kind=2:specd∘mark¨2+⍳2
+		kind=3:specd∘mark¨4+⍳4
+		kind=4:specd∘mark¨8+⍳8
+		⎕SIGNAL 11
+	}⍵
+}
+
+specialize_arcfide←{p t k n r vb←⍵
+	_←{r[⍵]⊣x×←rc[⍵]}⍣≡r⊣x←rc←1 1 2 4 8[k[i]]@(i←⍸t=F)⊢(≢p)⍴1
+	j←(+⍀x)-x ⋄ ro←∊⍳¨x ⋄ p t k n r vb rc⌿⍨←⊂x
+	p r{j[⍺]+⍵}←⊂⌊ro÷rc ⋄ vb[i]←j[vb[i]]+⌊ro[i]÷(x⌿x)[i]÷x[vb[i←⍸vb>0]]
+	k[i]←0 1 2 4 8[k[i]](⊣+|)ro[i←⍸t=F]
+	p t k n r vb
+}
+
+count←{0≡≢5⊃⍵:1 ⋄ 1++⌿∇¨5⊃⍵}
+
+load←{
+	tie←'arcfide_data.dcf'⎕FTIE 0
+	res←⎕FREAD tie ⍵
+	res⊣⎕FUNTIE tie
+}
+
+Run←{
+	tie←'arcfide_data.dcf'⎕FTIE 0
+	in←⎕FREAD tie 1
+	out←⎕FREAD tie 2
+	_←⎕FUNTIE tie
+	start←24 60 60 1000⊥¯4↑⎕TS
+	res←specialize_arcfide in
+	end←24 60 60 1000⊥¯4↑⎕TS
+	⎕←'Specialize time elapsed: ',(⍕(end-start)÷1000),'secs'
+	⎕←'Failed verification' 'Passed verification'[out≡res]
+}
+
+:EndNamespace
